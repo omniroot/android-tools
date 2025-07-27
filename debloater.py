@@ -77,8 +77,8 @@ def disable_services_and_recivers():
 
 
 def main():
-    # if not check_root():
-    #     sys.exit(1)
+    if not check_root():
+        sys.exit(1)
 
     print(
         "1. Debloate",
