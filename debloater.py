@@ -8,11 +8,11 @@ from pathlib import Path
 from typing import List, Dict
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s: %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(levelname)s: %(message)s"
 )
 
-CONFIG_PATH = Path(file).parent / "debloater.json"
+CONFIG_PATH = "debloater.json"
+
 
 def load_config() -> List[Dict[str, List[str]]]:
     if not CONFIG_PATH.exists():
@@ -30,13 +30,11 @@ def load_config() -> List[Dict[str, List[str]]]:
         logging.error(f"Ошибка чтения JSON: {e}")
         sys.exit(1)
 
+
 def check_root() -> bool:
     try:
         subprocess.run(
-            ['su', '-c', 'echo test'],
-            check=True,
-            capture_output=True,
-            text=True
+            ["su", "-c", "echo test"], check=True, capture_output=True, text=True
         )
         logging.info("Root-доступ подтвержден")
         return True
@@ -44,20 +42,17 @@ def check_root() -> bool:
         logging.error("Нет root-доступа")
         return False
 
+
 def freeze_app(package_name: str) -> bool:
     try:
         cmd = f"pm disable-user --user 0 {package_name}"
-        subprocess.run(
-            ['su', '-c', cmd],
-            check=True,
-            capture_output=True,
-            text=True
-        )
+        subprocess.run(["su", "-c", cmd], check=True, capture_output=True, text=True)
         logging.info(f"Приложение {package_name} заморожено")
         return True
     except subprocess.CalledProcessError as e:
         logging.error(f"Ошибка заморозки {package_name}: {e}")
         return False
+
 
 def freeze_apps_by_category(apps_to_freeze: List[Dict[str, List[str]]]):
     for category in apps_to_freeze:
@@ -70,11 +65,34 @@ def freeze_apps_by_category(apps_to_freeze: List[Dict[str, List[str]]]):
         for pkg in packages:
             freeze_app(pkg)
 
-def main():
-    if not check_root():
-        sys.exit(1)
+
+def debloat():
     apps_to_freeze = load_config()
     freeze_apps_by_category(apps_to_freeze)
 
-if name == 'main':
+
+def disable_services_and_recivers():
+    print("Work in progress...")
+    pass
+
+
+def main():
+    # if not check_root():
+    #     sys.exit(1)
+
+    print(
+        "1. Debloate",
+        "2. Disable app services and recivers",
+        "------------------------------------",
+        sep="\n",
+    )
+    choice = input("Введите номер пункта: ")
+    match choice:
+        case "1":
+            debloat()
+        case "2":
+            disable_services_and_recivers()
+
+
+if __name__ == "__main__":
     main()
